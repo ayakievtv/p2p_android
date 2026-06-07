@@ -1,0 +1,10 @@
+<resources>
+
+    <string name="app_name">P2P_Android</string>
+
+    <!-- Добавьте эти строки -->
+    <string name="your_id">Ваш ID</string>
+    <string name="enter_callee_id">Введите ID собеседника</string>
+    <string name="call">Вызвать</string>
+    <string name="hang_up">Завершить</string>
+</resources>
