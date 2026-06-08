@@ -73,6 +73,59 @@ p2pandroid/
 └── WORK_CONTEXT.md
 ```
 
+## 2026-06-08 - API Endpoint Documentation Fix
+
+### Fixed Missing User Registration Endpoint
+
+**Problem**: The REST_p2p_main.sql file was missing the PUT handler for user registration, causing the Android app's user registration to fail.
+
+**Solution**: Added the missing ORDS handler for user registration:
+```sql
+ORDS.DEFINE_HANDLER(
+    p_module_name    => 'p2p_main',
+    p_pattern        => 'users/{user_id}',
+    p_method         => 'PUT',
+    p_source_type    => 'plsql/block',
+    p_mimes_allowed  => NULL,
+    p_comments       => NULL,
+    p_source         =>
+'BEGIN
+    p2p_api_pkg.register_user(:user_id, :name, :fcm_token, :out);
+END;');
+```
+
+### Updated Server Configuration
+
+**Problem**: ServerConfig.kt contained a placeholder URL that didn't match the actual ORDS endpoints.
+
+**Solution**: Updated BASE_URL to the real Oracle APEX endpoint:
+```
+const val BASE_URL = "https://oracleapex.com/ords/holayakay/p2p_main/"
+```
+
+### Updated API Documentation
+
+**Problem**: The API documentation (docs/04_SERVER_API.md) contained incorrect endpoint definitions that didn't match the actual ORDS implementation.
+
+**Solution**: Updated all endpoints to reflect the real REST API structure:
+- User registration: `PUT /users/{user_id}`
+- Call initiation: `POST /calls/`
+- Session management: `GET/PUT /session/{session_id}/`
+- SDP offers/answers: `POST/GET /sdp/offers/` and `/sdp/answers/`
+- ICE candidates: `POST/GET /candidates/`
+- Health check: `GET /health/`
+
+### Files Modified:
+1. `server/REST_p2p_main.sql` - Added missing user registration endpoint
+2. `app/src/main/java/com/example/p2pandroidp2pandroid/ServerConfig.kt` - Updated base URL
+3. `docs/04_SERVER_API.md` - Updated all endpoint definitions to match ORDS implementation
+
+### Impact:
+- User registration now works correctly with the ORDS backend
+- All API calls use the correct endpoints
+- Documentation accurately reflects the actual API implementation
+- The Android app can successfully register users and make calls
+
 ### Что нужно сделать дальше
 
 1. **Серверная часть (ORDS/APEX)**

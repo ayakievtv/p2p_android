@@ -9,6 +9,9 @@ SET TIMING OFF
 WHENEVER SQLError ON ROLLBACK
 WHENEVER SQLerror ON ROLLBACK
 
+--Workspace:	holayakay
+--Username:	holayakay806@gmail.com
+
 -- -----------------------------------------------------------------------------
 -- 1. CREATE TABLES
 -- -----------------------------------------------------------------------------
@@ -104,7 +107,7 @@ END p2p_api_pkg;
 -- 3. PACKAGE BODY
 -- -----------------------------------------------------------------------------
 
-CREATE OR REPLACE PACKAGE BODY p2p_api_pkg AS
+create or replace PACKAGE BODY p2p_api_pkg AS
 
     PROCEDURE register_user(p_user_id IN VARCHAR2, p_fcm_token IN VARCHAR2 DEFAULT NULL, p_name IN VARCHAR2 DEFAULT NULL, p_result OUT VARCHAR2) IS
     BEGIN
@@ -114,20 +117,20 @@ CREATE OR REPLACE PACKAGE BODY p2p_api_pkg AS
         p_result := '{"success":true}';
     EXCEPTION WHEN OTHERS THEN p_result := '{"success":false,"error":"' || SUBSTR(SQLERRM, 1, 200) || '"}';
     END register_user;
-  
+
     FUNCTION get_user_fcm_token(p_user_id IN VARCHAR2) RETURN VARCHAR2 IS v_token VARCHAR2(1000);
     BEGIN SELECT fcm_token INTO v_token FROM app_users WHERE user_id = p_user_id; RETURN v_token; EXCEPTION WHEN NO_DATA_FOUND THEN RETURN NULL; END get_user_fcm_token;
-  
+
     FUNCTION get_user_name(p_user_id IN VARCHAR2) RETURN VARCHAR2 IS v_name VARCHAR2(100);
     BEGIN SELECT name INTO v_name FROM app_users WHERE user_id = p_user_id; RETURN v_name; EXCEPTION WHEN NO_DATA_FOUND THEN RETURN NULL; END get_user_name;
-  
+
     FUNCTION get_user_json(p_user_id IN VARCHAR2) RETURN CLOB IS v_result CLOB;
     BEGIN
         SELECT '{"user_id":"' || user_id || '","fcm_token":"' || SUBSTR(fcm_token, 1, 1000) || '","name":"' || SUBSTR(name, 1, 100) || '"}' INTO v_result FROM app_users WHERE user_id = p_user_id;
         RETURN v_result;
     EXCEPTION WHEN NO_DATA_FOUND THEN RETURN NULL;
     END get_user_json;
-  
+
     PROCEDURE initiate_call(p_caller_id IN VARCHAR2, p_callee_id IN VARCHAR2, p_session_id OUT VARCHAR2, p_result OUT VARCHAR2) IS
     BEGIN
         p_session_id := SYS_GUID();
@@ -135,28 +138,28 @@ CREATE OR REPLACE PACKAGE BODY p2p_api_pkg AS
         p_result := '{"session_id":"' || p_session_id || '"}';
     EXCEPTION WHEN OTHERS THEN p_result := '{"success":false,"error":"' || SUBSTR(SQLERRM, 1, 200) || '"}';
     END initiate_call;
-  
+
     PROCEDURE update_session_status(p_session_id IN VARCHAR2, p_status IN VARCHAR2, p_result OUT VARCHAR2) IS
     BEGIN
         UPDATE call_sessions SET status = p_status, updated_at = CURRENT_TIMESTAMP WHERE session_id = p_session_id;
         p_result := CASE WHEN SQL%ROWCOUNT > 0 THEN '{"success":true}' ELSE '{"success":false,"error":"Session not found"}' END;
     EXCEPTION WHEN OTHERS THEN p_result := '{"success":false,"error":"' || SUBSTR(SQLERRM, 1, 200) || '"}';
     END update_session_status;
-  
+
     FUNCTION get_session_json(p_session_id IN VARCHAR2) RETURN CLOB IS v_result CLOB;
     BEGIN
         SELECT '{"session_id":"' || session_id || '","caller_id":"' || caller_id || '","callee_id":"' || callee_id || '","status":"' || status || '","created_at":"' || TO_CHAR(created_at, 'YYYY-MM-DD HH24:MI:SS') || '"}' INTO v_result FROM call_sessions WHERE session_id = p_session_id;
         RETURN v_result;
     EXCEPTION WHEN NO_DATA_FOUND THEN RETURN NULL;
     END get_session_json;
-  
+
     PROCEDURE save_offer(p_session_id IN VARCHAR2, p_sdp IN CLOB, p_result OUT VARCHAR2) IS
     BEGIN
         MERGE INTO sdp_offers o USING (SELECT p_session_id AS session_id FROM dual) q ON (o.session_id = q.session_id) WHEN MATCHED THEN UPDATE SET offer_sdp = p_sdp WHEN NOT MATCHED THEN INSERT (session_id, offer_sdp) VALUES (p_session_id, p_sdp);
         p_result := '{"success":true}';
     EXCEPTION WHEN OTHERS THEN p_result := '{"success":false,"error":"' || SUBSTR(SQLERRM, 1, 200) || '"}';
     END save_offer;
-  
+
     FUNCTION get_offer(p_session_id IN VARCHAR2) RETURN CLOB IS v_sdp CLOB;
     BEGIN SELECT offer_sdp INTO v_sdp FROM sdp_offers WHERE session_id = p_session_id; RETURN v_sdp; EXCEPTION WHEN NO_DATA_FOUND THEN RETURN NULL;
     END get_offer;
@@ -166,14 +169,14 @@ CREATE OR REPLACE PACKAGE BODY p2p_api_pkg AS
         RETURN v_result;
     EXCEPTION WHEN NO_DATA_FOUND THEN RETURN NULL;
     END get_offer_json;
-  
+
     PROCEDURE save_answer(p_session_id IN VARCHAR2, p_sdp IN CLOB, p_result OUT VARCHAR2) IS
     BEGIN
         MERGE INTO sdp_answers a USING (SELECT p_session_id AS session_id FROM dual) q ON (a.session_id = q.session_id) WHEN MATCHED THEN UPDATE SET answer_sdp = p_sdp WHEN NOT MATCHED THEN INSERT (session_id, answer_sdp) VALUES (p_session_id, p_sdp);
         p_result := '{"success":true}';
     EXCEPTION WHEN OTHERS THEN p_result := '{"success":false,"error":"' || SUBSTR(SQLERRM, 1, 200) || '"}';
     END save_answer;
-  
+
     FUNCTION get_answer(p_session_id IN VARCHAR2) RETURN CLOB IS v_sdp CLOB;
     BEGIN SELECT answer_sdp INTO v_sdp FROM sdp_answers WHERE session_id = p_session_id; RETURN v_sdp; EXCEPTION WHEN NO_DATA_FOUND THEN RETURN NULL;
     END get_answer;
@@ -183,26 +186,30 @@ CREATE OR REPLACE PACKAGE BODY p2p_api_pkg AS
         RETURN v_result;
     EXCEPTION WHEN NO_DATA_FOUND THEN RETURN NULL;
     END get_answer_json;
-  
+
     PROCEDURE add_candidate(p_session_id IN VARCHAR2, p_candidate IN VARCHAR2, p_sdp_mid IN VARCHAR2, p_sdp_manced IN NUMBER, p_result OUT VARCHAR2) IS
     BEGIN
         INSERT INTO ice_candidates (session_id, candidate, sdp_mid, sdp_manced) VALUES (p_session_id, p_candidate, p_sdp_mid, p_sdp_manced);
         p_result := '{"success":true}';
     EXCEPTION WHEN OTHERS THEN p_result := '{"success":false,"error":"' || SUBSTR(SQLERRM, 1, 200) || '"}';
     END add_candidate;
-  
+
     FUNCTION get_candidates(p_session_id IN VARCHAR2) RETURN CLOB IS v_result CLOB;
     BEGIN
         SELECT JSON_ARRAYAGG(JSON_OBJECT('candidate' VALUE candidate, 'sdp_mid' VALUE sdp_mid, 'sdp_manced' VALUE sdp_manced)) INTO v_result FROM ice_candidates WHERE session_id = p_session_id;
-        RETURN v_result;
+        -- Handle case where JSON_ARRAYAGG returns NULL if no candidates are found
+        RETURN COALESCE(v_result, '[]');
     EXCEPTION WHEN NO_DATA_FOUND THEN RETURN '[]';
     END get_candidates;
-  
-    FUNCTION get_candidates_json(p_session_id IN VARCHAR2) RETURN CLOB IS v_result CLOB;
+
+    -- FIXED FUNCTION: Removed SELECT FROM dual and handled empty array logic safely
+    FUNCTION get_candidates_json(p_session_id IN VARCHAR2) RETURN CLOB IS
+        v_candidates CLOB;
     BEGIN
-        SELECT '{"session_id":"' || p_session_id || '","candidates":' || get_candidates(p_session_id) || '}' INTO v_result FROM dual;
-        RETURN v_result;
-    EXCEPTION WHEN OTHERS THEN RETURN '[]';
+        v_candidates := get_candidates(p_session_id);
+        RETURN '{"session_id":"' || p_session_id || '","candidates":' || v_candidates || '}';
+    EXCEPTION WHEN OTHERS THEN
+        RETURN '{"session_id":"' || p_session_id || '","candidates":[]}';
     END get_candidates_json;
   
     FUNCTION health_check RETURN VARCHAR2 IS

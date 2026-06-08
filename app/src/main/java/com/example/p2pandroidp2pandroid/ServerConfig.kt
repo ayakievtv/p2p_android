@@ -2,7 +2,7 @@ package com.example.p2pandroidp2pandroid
 
 object ServerConfig {
     // TODO: Update to your Oracle RDS ORDS endpoint
-    const val BASE_URL = "https://your-rds-host.com/ords/p2p/"
+    const val BASE_URL = "https://oracleapex.com/ords/holayakay/p2p_main/"
     
     // Endpoints
     const val USERS = "${BASE_URL}users/"

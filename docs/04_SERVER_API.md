@@ -10,9 +10,9 @@
 
 ## Эндпоинты
 
-### 1. Регистрация токена
+### 1. Регистрация пользователя
 ```
-POST /register_token
+PUT /users/{user_id}
 Body: {
   "user_id": "string",
   "fcm_token": "string",
@@ -23,7 +23,7 @@ Response: {"success": true}
 
 ### 2. Инициация звонка
 ```
-POST /call_initiate
+POST /calls/
 Body: {
   "caller_id": "string",
   "callee_id": "string"
@@ -33,7 +33,7 @@ Response: {"session_id": "uuid"}
 
 ### 3. Получение сессии
 ```
-GET /call_get_session?session_id=uuid
+GET /session/{session_id}/
 Response: {
   "session_id": "uuid",
   "caller_id": "string",
@@ -42,62 +42,71 @@ Response: {
 }
 ```
 
-### 4. Отправка SDP offer
+### 4. Обновление статуса сессии
 ```
-POST /call_send_offer
+PUT /session/{session_id}/
 Body: {
-  "session_id": "uuid",
-  "offer_sdp": "sdp string"
+  "status": "pending|active|ended|rejected"
 }
+Response: {"success": true}
 ```
 
-### 5. Получение SDP offer
+### 5. Отправка SDP offer
 ```
-GET /call_get_offer?session_id=uuid
+POST /sdp/offers/
+Body: {
+  "session_id": "uuid",
+  "sdp": "sdp string"
+}
+Response: {"success": true}
+```
+
+### 6. Получение SDP offer
+```
+GET /sdp/offers/{session_id}/
 Response: {"offer_sdp": "sdp string"}
 ```
 
-### 6. Отправка SDP answer
+### 7. Отправка SDP answer
 ```
-POST /call_send_answer
+POST /sdp/answers/
 Body: {
   "session_id": "uuid",
-  "answer_sdp": "sdp string"
+  "sdp": "sdp string"
 }
+Response: {"success": true}
 ```
 
-### 7. Получение SDP answer
+### 8. Получение SDP answer
 ```
-GET /call_get_answer?session_id=uuid
+GET /sdp/answers/{session_id}/
 Response: {"answer_sdp": "sdp string"}
 ```
 
-### 8. Отправка ICE кандидата
+### 9. Отправка ICE кандидата
 ```
-POST /call_send_candidate
+POST /candidates/
 Body: {
   "session_id": "uuid",
   "candidate": "ice candidate string",
   "sdp_mid": "string",
   "sdp_manced": 0
 }
+Response: {"success": true}
 ```
 
-### 9. Получение ICE кандидатов
+### 10. Получение ICE кандидатов
 ```
-GET /call_get_candidates?session_id=uuid
+GET /candidates/{session_id}/
 Response: [
   {"candidate": "...", "sdp_mid": "...", "sdp_manced": 0}
 ]
 ```
 
-### 10. Обновление статуса звонка
+### 11. Проверка здоровья сервиса
 ```
-POST /call_update_status
-Body: {
-  "session_id": "uuid",
-  "status": "pending|active|ended|rejected"
-}
+GET /health/
+Response: {"status": "ok"}
 ```
 
 ## Требуемые таблицы базы данных
