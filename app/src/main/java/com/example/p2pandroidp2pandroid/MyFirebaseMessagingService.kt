@@ -14,10 +14,10 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
     companion object {
         private const val TAG = "FCM"
-        const val ACTION_CALL_INVITATION = "com.example.p2papp.ACTION_CALL_INVITATION"
-        const val ACTION_CALL_ACCEPTED = "com.example.p2papp.ACTION_CALL_ACCEPTED"
-        const val ACTION_CALL_REJECTED = "com.example.p2papp.ACTION_CALL_REJECTED"
-        const val ACTION_CALL_ENDED = "com.example.p2papp.ACTION_CALL_ENDED"
+        const val ACTION_CALL_INVITATION = "com.example.p2pandroidp2pandroid.ACTION_CALL_INVITATION"
+        const val ACTION_CALL_ACCEPTED = "com.example.p2pandroidp2pandroid.ACTION_CALL_ACCEPTED"
+        const val ACTION_CALL_REJECTED = "com.example.p2pandroidp2pandroid.ACTION_CALL_REJECTED"
+        const val ACTION_CALL_ENDED = "com.example.p2pandroidp2pandroid.ACTION_CALL_ENDED"
     }
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
