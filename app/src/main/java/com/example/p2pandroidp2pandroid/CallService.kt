@@ -17,10 +17,10 @@ class CallService : Service() {
         private const val TAG = "CallService"
 
         // Actions
-        const val ACTION_INCOMING_CALL = "com.example.p2papp.action.INCOMING_CALL"
-        const val ACTION_CALL_ACCEPTED = "com.example.p2papp.action.CALL_ACCEPTED"
-        const val ACTION_CALL_ENDED = "com.example.p2papp.action.CALL_ENDED"
-        const val ACTION_CALL_REJECTED = "com.example.p2papp.action.CALL_REJECTED"
+        const val ACTION_INCOMING_CALL = "com.example.p2pandroidp2pandroid.action.INCOMING_CALL"
+        const val ACTION_CALL_ACCEPTED = "com.example.p2pandroidp2pandroid.action.CALL_ACCEPTED"
+        const val ACTION_CALL_ENDED = "com.example.p2pandroidp2pandroid.action.CALL_ENDED"
+        const val ACTION_CALL_REJECTED = "com.example.p2pandroidp2pandroid.action.CALL_REJECTED"
 
         // Extras
         const val EXTRA_SESSION_ID = "session_id"

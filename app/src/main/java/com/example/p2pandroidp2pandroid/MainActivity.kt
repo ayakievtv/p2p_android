@@ -25,8 +25,8 @@ import androidx.compose.ui.window.Dialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
-import com.example.p2papp.ui.theme.P2PAndroidTheme
-import com.example.p2papp.webrtc.WebRTCManager
+import com.example.p2pandroidp2pandroid.ui.theme.P2PAndroidTheme
+import com.example.p2pandroidp2pandroid.webrtc.WebRTCManager
 import com.google.firebase.FirebaseApp
 import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.launch

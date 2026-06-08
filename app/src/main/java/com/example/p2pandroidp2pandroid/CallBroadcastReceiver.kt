@@ -21,7 +21,7 @@ class CallBroadcastReceiver : BroadcastReceiver() {
                 // Could toggle speakerphone or pause video
             }
         
-            "com.example.p2papp.action.END_CALL" -> {
+            "com.example.p2pandroidp2pandroid.action.END_CALL" -> {
                 endCall(context)
             }
         }

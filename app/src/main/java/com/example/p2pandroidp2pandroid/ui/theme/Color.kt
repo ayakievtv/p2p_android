@@ -1,4 +1,4 @@
-package com.example.p2papp.ui.theme
+package com.example.p2pandroidp2pandroid.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
