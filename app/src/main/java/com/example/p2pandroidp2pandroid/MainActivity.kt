@@ -51,6 +51,9 @@ class MainActivity : ComponentActivity() {
 
         FirebaseApp.initializeApp(this)
 
+        if (ApiClient.TEST_MODE) {
+            android.util.Log.w("MainActivity", "TEST MODE enabled — using ORDS test_connect")
+        }
 
         apiClient = ApiClient()
 
@@ -88,6 +91,10 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun registerFcmToken() {
+        if (ApiClient.TEST_MODE) {
+            android.util.Log.w("MainActivity", "TEST MODE: skipping FCM token registration")
+            return
+        }
         lifecycleScope.launch {
             FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
                 if (task.isSuccessful) {
@@ -324,16 +331,37 @@ class MainActivity : ComponentActivity() {
         if (calleeIdText.isBlank()) return
 
         callStatus = CallStatus.CONNECTING
-        currentCalleeId = calleeIdText
 
-        apiClient.initiateCall(userId, calleeIdText) { sessionId ->
-            runOnUiThread {
-                sessionId?.let {
-                    currentSessionId = it
-                    Toast.makeText(this, "Call initiated: $it", Toast.LENGTH_SHORT).show()
-                } ?: run {
-                    callStatus = CallStatus.ENDED
-                    Toast.makeText(this, "Failed to initiate call", Toast.LENGTH_SHORT).show()
+        if (ApiClient.TEST_MODE) {
+            // Hardcoded test IDs — bypass real Firebase flow
+            val testCallerId = "айдар"
+            val testCalleeId = "мама"
+            currentCalleeId = testCalleeId
+            android.util.Log.d("MainActivity", "TEST MODE: initiateCall caller=$testCallerId callee=$testCalleeId")
+
+            apiClient.testConnect(testCallerId, testCalleeId) { sessionId ->
+                runOnUiThread {
+                    sessionId?.let {
+                        currentSessionId = it
+                        Toast.makeText(this, "Test call initiated: $it", Toast.LENGTH_SHORT).show()
+                    } ?: run {
+                        callStatus = CallStatus.ENDED
+                        Toast.makeText(this, "Failed to initiate test call", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        } else {
+            currentCalleeId = calleeIdText
+
+            apiClient.initiateCall(userId, calleeIdText) { sessionId ->
+                runOnUiThread {
+                    sessionId?.let {
+                        currentSessionId = it
+                        Toast.makeText(this, "Call initiated: $it", Toast.LENGTH_SHORT).show()
+                    } ?: run {
+                        callStatus = CallStatus.ENDED
+                        Toast.makeText(this, "Failed to initiate call", Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
         }

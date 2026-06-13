@@ -2,7 +2,7 @@ package com.example.p2pandroidp2pandroid
 
 object ServerConfig {
     // TODO: Update to your Oracle RDS ORDS endpoint
-    const val BASE_URL = "https://oracleapex.com/ords/holayakay/p2p_main/"
+    const val BASE_URL = "https://oracleapex.com/ords/yakiev/p2p_main/"
     
     // Endpoints
     const val USERS = "${BASE_URL}users/"
@@ -12,4 +12,7 @@ object ServerConfig {
     const val SDP_ANSWERS = "${BASE_URL}sdp/answers/"
     const val ICE_CANDIDATES = "${BASE_URL}candidates/"
     const val HEALTH = "${BASE_URL}health/"
+    
+    // Test / development endpoints
+    const val TEST_CONNECT = "${BASE_URL}signaling/test_connect/"
 }

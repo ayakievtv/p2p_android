@@ -11,9 +11,21 @@ class ApiClient {
     companion object {
         private const val TAG = "ApiClient"
         private const val TIMEOUT_MS: Long = 15000
+
+        // Toggle test mode: sends ORDS test_connect instead of real Firebase flow
+        var TEST_MODE = true
     }
 
     private val client = OkHttpClient.Builder()
+        .addInterceptor { chain ->
+            val request = chain.request()
+                .newBuilder()
+                .header("User-Agent", "Android")
+                .build()
+
+            chain.proceed(request)
+        }
+
         .connectTimeout(TIMEOUT_MS, java.util.concurrent.TimeUnit.MILLISECONDS)
         .readTimeout(TIMEOUT_MS, java.util.concurrent.TimeUnit.MILLISECONDS)
         .build()
@@ -56,6 +68,34 @@ class ApiClient {
                 callback(sessionId)
             }
             override fun onFailure(call: Call, e: IOException) { callback(null) }
+        })
+    }
+
+    // --- Test Connect (ORDS test endpoint, no real FCM token needed) ---
+    fun testConnect(callerId: String, calleeId: String, callback: (String?) -> Unit) {
+        Log.d(TAG, "TEST_MODE: calling ${ServerConfig.TEST_CONNECT} caller=$callerId callee=$calleeId")
+        val json = JSONObject().put("caller_id", callerId).put("callee_id", calleeId)
+        val body = json.toString().toRequestBody("application/json; charset=utf-8".toMediaType())
+        val request = Request.Builder()
+            .url(ServerConfig.TEST_CONNECT)
+            .post(body)
+            .build()
+        client.newCall(request).enqueue(object : Callback {
+            override fun onResponse(call: Call, response: Response) {
+                val sessionId = if (response.isSuccessful) {
+                    val bodyStr = response.body?.string() ?: "{}"
+                    Log.d(TAG, "TEST_MODE response: $bodyStr")
+                    JSONObject(bodyStr).optString("session_id")
+                } else {
+                    Log.e(TAG, "TEST_MODE failed: ${response.code}")
+                    null
+                }
+                callback(sessionId)
+            }
+            override fun onFailure(call: Call, e: IOException) {
+                Log.e(TAG, "TEST_MODE network error: ${e.message}")
+                callback(null)
+            }
         })
     }
 
